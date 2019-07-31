@@ -1,0 +1,294 @@
+\documentclass[9pt]{beamer}
+\usetheme{Madrid}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\usepackage{pgfpages}
+
+\usepackage{array}  % image alignment in tabular
+\author{Pietro Mascolo}
+\title{Sequence modeling for product classification}
+\logo{\includegraphics[height=0.45cm]{flow_resources/flow-logo-icon-&-type-color.png}}
+%\setbeamercovered{transparent} 
+%\setbeamertemplate{navigation symbols}{} 
+%\logo{} 
+\institute{\href{http://www.flow.io}{Flow Comerce}} 
+%\date{} 
+%\subject{} 
+
+\setbeamertemplate{note page}[plain]
+\setbeameroption{show notes on second screen=right}
+
+% Flow palette
+\definecolor{FlowBlue}{RGB}{00,81,178}
+\definecolor{VibrantBlue}{RGB}{71,145,255}
+\definecolor{Steel}{RGB}{128,128,128}
+\definecolor{Silver}{RGB}{191,191,191}
+\definecolor{LightSilver}{RGB}{220,220,220}
+\definecolor{VeryLightSilver}{RGB}{240,240,240}
+\definecolor{Accent1}{RGB}{85,218,255}
+\definecolor{Accent2}{RGB}{249,119,98}
+\definecolor{Accent3}{RGB}{250,221,5}
+\definecolor{Accent4}{RGB}{82,212,253}
+\definecolor{AccentAlert}{RGB}{249,50,50}
+
+% More info on sections and parts of beamer here: http://www.cpt.univ-mrs.fr/~masson/latex/Beamer-appearance-cheat-sheet.pdf
+
+% general
+\setbeamercolor{palette primary}{bg=FlowBlue}
+\setbeamercolor{palette secondary}{bg=VibrantBlue}
+\setbeamercolor{palette tertiary}{bg=Steel}
+\setbeamercolor{palette quaternary}{bg=Accent1}
+\setbeamercolor{palette sidebar primary}{bg=Accent1}
+\setbeamercolor{palette sidebar secondary}{bg=Accent2}
+\setbeamercolor{palette sidebar tertiary}{bg=Accent2}
+\setbeamercolor{palette sidebar quaternary}{bg=Accent4}
+
+% hyperlinks
+\setbeamercolor{button}{use=Accent4}
+\setbeamercolor{button border}{use=Accent4}
+
+% structure
+\setbeamercolor{structure}{fg=FlowBlue}
+\setbeamercolor{local structure}{fg=Accent4}
+\setbeamercolor{alerted text}{fg=AccentAlert, bg=LightSilver}
+
+% block
+\setbeamercolor{block title}{bg=FlowBlue}
+\setbeamercolor{block body}{bg=VeryLightSilver}
+
+% titles
+\setbeamercolor{title}{bg=FlowBlue, fg=white}
+\setbeamercolor{frametitle}{bg=FlowBlue, fg=white}
+
+%itemization
+%\setbeamercolor{itemize item}{bg=FlowBlue}
+%\setbeamercolor{itemize subitem}{bg=FlowBlue}
+%\setbeamercolor{itemize subsubitem}{bg=FlowBlue}
+%\setbeamercolor{enumerate item}{bg=FlowBlue}
+%\setbeamercolor{enumerate subitem}{bg=FlowBlue}
+%\setbeamercolor{enumerate subsubitem}{bg=FlowBlue}
+%\setbeamertemplate{itemize item}{\color{FlowBlue}}
+%\setbeamertemplate{enumerate item}{\color{FlowBlue}}
+
+%\setbeamerfont{section number projected}{family=\rmfamily,series=\bfseries,size=\normalsize}
+\setbeamercolor{section number projected}{bg=FlowBlue,fg=white}
+\setbeamercolor{subsection number projected}{bg=FlowBlue}
+
+\setbeamercolor{structure}{bg=FlowBlue}
+
+% margins
+\setbeamersize{text margin left=10mm,text margin right=10mm}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{This presentation}
+	\tableofcontents
+\end{frame}
+
+
+\section{Problem statement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Introduction}
+	\begin{block}{Problem statement}
+		We want to classify a generic product into an HS6 code and a brief description in order to determine duty rates for a given origin and destination.
+	\end{block}
+	\vspace{0.5cm}
+	
+	\pause
+	\begin{center}
+		\begin{tabular}{ c  c m{5cm} }
+			\begin{minipage}{4cm}
+			\begin{figure}
+					\includegraphics[width=4cm]{imgs/boot.png}
+					 \tiny{A classically styled pair of leather Chelsea boots, featuring elasticated side panels, heel pull tabs and finished with a subtle...}
+				\end{figure}
+			\end{minipage} \pause
+			& $\longrightarrow$ 
+			& $$\left\{ 
+				\begin{array}{l} 
+					\text{description: womens leather boot} \\
+					\\
+					\text{HS6: 640391}
+				\end{array} 
+			\right.$$ \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+
+\section{First approach}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Our initial approach}
+	\begin{center}
+		\includegraphics[width=0.4\textwidth,height=!,trim={0 0 30cm 5cm},clip]{imgs/houses.jpg}
+	\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Initial models}
+	\begin{itemize}
+		\item TFIDF encoded representation of text;
+		\item one model per organization (20-30);
+		\item reasonably accurate.
+	\end{itemize}
+	\pause
+	\vspace{1cm}
+	\begin{center}
+		\Large{\textbf{BUT...}}
+	\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Little to no generalization}
+	\begin{center}
+		\begin{figure}
+			\includegraphics[width=0.6\textwidth,height=!]{imgs/huffedandpuffed.png}
+			\caption{\textit{...and he huffed and he puffed and he blew the house in...}}
+		\end{figure}
+	\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Problems!!}
+	\begin{itemize}
+		\item TFIDF encoding doesn't capture sequence relationship well! %\note{TFIDF can represent some n-gram features, but in a very limited way.}
+		\item Many models to keep track of!
+		\item Hard performance evaluation!
+		\item Some organizations have very little data to work on!
+		\item Some organizations have a very limited catalogue (1 or 2 types of items)!
+	\end{itemize}
+
+	\pause
+	\begin{center}
+		\includegraphics[width=0.2\textwidth]{imgs/sad.png}
+	\end{center}
+\end{frame}
+
+
+\section{A new approach}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{A new approach}
+	\begin{center}
+		\includegraphics[width=0.4\textwidth,height=!,trim={16cm 0 17.5cm 5cm},clip]{imgs/houses.jpg}
+	\end{center}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Sequence modeling}
+	We want to:
+	\begin{itemize}
+		\item Have a single general model;
+		\item capture information regarding patterns in sequences of words;
+		\item be able add a new organization seamlessly (if we have seen the kind of products they sell).
+	\end{itemize}
+	\vspace{0.5cm}
+	These requirements suggest that we need a more sophisticated method than what we are using.
+	
+	\pause
+	\vspace{1cm}
+	\begin{center}
+		\Large{\textbf{Enter Neural Networks...}}
+	\end{center}
+	
+\end{frame}
+
+\subsection{Neural networks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{A primer on neural networks}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{How Neural Networks learn}
+
+\end{frame}
+
+
+\subsection{Recurrent networks and sequence modeling}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Sequence learning - Recurrent Neural Networks}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Short Term memory problem - vanishing gradient}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{LSTM}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{GRU}
+
+\end{frame}
+
+\section{Our classification model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{The model}
+
+\end{frame}
+
+\subsection{Data preparation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{The data}
+
+\end{frame}
+
+
+\subsection{Evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Results and evaluation}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Problems??}
+	\begin{center}
+		\begin{figure}
+			\includegraphics[width=0.6\textwidth,height=!]{imgs/huffedandpuffed.png}
+			\caption{\textit{...and he huffed and he puffed, \textbf{but he hasn't blown the house in... yet...}}}
+		\end{figure}
+	\end{center}
+\end{frame}
+
+\section{Demo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Let's see it in action}
+
+\begin{center}
+	\Huge{\href{http://localhost:8888}{Demo!}}
+\end{center}
+
+\end{frame}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Conclusions and future work}
+	\begin{center}
+		\includegraphics[width=0.4\textwidth,height=!,trim={29cm 0 0 5.2cm},clip]{imgs/houses.jpg}
+	\end{center}
+\end{frame}
+\end{document}
