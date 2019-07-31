@@ -8,7 +8,11 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{adjustbox}
-\usepackage{pgfpages}
+
+% PRESENTER NOTES
+%\usepackage{pgfpages}
+%\setbeamertemplate{note page}[plain]
+%\setbeameroption{show notes on second screen=right}
 
 \usepackage{array}  % image alignment in tabular
 \author{Pietro Mascolo}
@@ -21,8 +25,7 @@
 %\date{} 
 %\subject{} 
 
-\setbeamertemplate{note page}[plain]
-\setbeameroption{show notes on second screen=right}
+
 
 % Flow palette
 \definecolor{FlowBlue}{RGB}{00,81,178}
@@ -211,12 +214,44 @@
 \subsection{Neural networks}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{A primer on neural networks}
-
+	\begin{center}
+		\only<1>{
+			\begin{figure}
+				\includegraphics[width=\textwidth]{imgs/nn.png}
+				\caption{Shallow and deep neural networks}
+			\end{figure}
+		}
+		\only<2>{
+			\begin{figure}
+				\includegraphics[width=0.7\textwidth]{imgs/ann.png}
+				\caption{Neuron connections}
+			\end{figure}
+		}
+		\only<3>{
+			\begin{figure}
+				\includegraphics[width=\textwidth,trim={0 1cm 0 0},clip]{imgs/neuron.png}
+				\caption{How a neuron works}
+			\end{figure}
+		}
+	\end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{How Neural Networks learn}
-
+\begin{frame}{How Neural Networks learn - backpropagation}
+	\begin{center}
+		\only<1>{
+			\begin{figure}
+				\includegraphics[width=0.8\textwidth]{imgs/forward-propagation.png}
+				\caption{Forward propagation - getting output}
+			\end{figure}
+		}
+		\only<2>{
+			\begin{figure}
+				\includegraphics[width=0.8\textwidth]{imgs/backpropagation.png}
+				\caption{Back propagation - calculating A LOT of derivatives}
+			\end{figure}
+		}
+	\end{center}
 \end{frame}
 
 
@@ -224,23 +259,99 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Sequence learning - Recurrent Neural Networks}
-
+	\begin{center}
+		\only<1>{
+			\begin{figure}
+				\includegraphics[width=0.3\textwidth, trim={0 0 38cm 0},clip]{imgs/recurrent.png}
+				\caption{Recurrent cell}
+			\end{figure}
+		}
+		\only<2>{
+			\begin{figure}
+				\includegraphics[width=\textwidth]{imgs/recurrent.png}
+				\caption{Recurrent cell unfolded}
+			\end{figure}
+		}
+	\end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Short Term memory problem - vanishing gradient}
-
+\begin{frame}{Short Term memory problem - vanishing or exploding gradient}
+	\begin{figure}
+		\includegraphics[width=\textwidth,trim={0 0 0 3cm},clip]{imgs/vanishing.png}
+		\caption{Vanishing gradient illustration}
+	\end{figure}
+	\pause
+	\begin{alertblock}{Problem}
+		RNN don't work well with long sequences: they lose knowledge of long term dependencies.\\
+		They have a \textbf{short memory}.
+	\end{alertblock}
+	
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{LSTM}
+\begin{frame}{Solving the short memory}
+	\begin{block}{LSTM and GRU solve the short memory problem}{
+		LSTM $\rightarrow$ Long Short Memory \\
+		GRU $\rightarrow$ Gated Recurrent Unit
+	}
+	\end{block}
+	
+	\only<1>{
+	
+		\begin{center}
+			\begin{tabular}{ c  m{5cm} }
+				\begin{minipage}{0.5\textwidth}
+				\begin{figure}
+						\includegraphics[width=0.8\textwidth,trim={3cm 0 20cm 0},clip]{imgs/lstmandgru.png}
+						 \caption{LSTM cell}
+					\end{figure}
+				\end{minipage}
 
+				& $$
+					\begin{array}{l} 
+						i_t = \sigma\left( x_t U^i + h_{t-1} W^i\right) \\
+						f_t = \sigma\left( x_t U^f + h_{t-1} W^f\right) \\
+						o_t = \sigma\left( x_t U^o + h_{t-1} W^o\right) \\
+						\widetilde{C}_t = \tanh \left( x_t U^g + h_{t-1} W^g \right)\\
+						C_t = \sigma\left( f_t \ast C_{t-1} + i_t \ast \widetilde{C}_t\right) \\
+						h_t = \tanh \left( C_t \ast o_t \right)
+					\end{array} 
+				$$ \\
+			\end{tabular}
+		\end{center}
+	}
+	
+	\only<2>{
+		\begin{center}
+			\begin{tabular}{ c  m{5cm} }
+				\begin{minipage}{0.5\textwidth}
+				\begin{figure}
+						\includegraphics[width=0.8\textwidth,trim={20cm 0 3cm 0},clip]{imgs/lstmandgru.png}
+						 \caption{LSTM cell}
+					\end{figure}
+				\end{minipage}
+
+				& $$
+					\begin{array}{l} 
+						z_t = \sigma\left( x_t U^z + h_{t-1} W^z\right) \\
+						r_t = \sigma\left( x_t U^r + h_{t-1} W^r\right) \\
+						o_t = \sigma\left( x_t U^o + h_{t-1} W^o\right) \\
+						\widetilde{h}_t = \tanh \left( x_t U^h +(r_t \ast h_{t-1}) W^h \right)\\
+						h_t =  \left( 1-z_t \right) \ast h_{t-1} + z_t \ast \widetilde{h}_t
+					\end{array} 
+				$$ \\
+			\end{tabular}
+		\end{center}
+	}
+	
+	
+	%\begin{figure}
+%		\includegraphics[width=\textwidth]{imgs/lstmandgru.png}
+%		\caption{LSTM and GRU cell structure}
+%	\end{figure}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{GRU}
-
-\end{frame}
 
 \section{Our classification model}
 
