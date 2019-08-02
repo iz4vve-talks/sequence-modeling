@@ -242,13 +242,13 @@
 		\only<1>{
 			\begin{figure}
 				\includegraphics[width=0.8\textwidth]{imgs/forward-propagation.png}
-				\caption{Forward propagation - getting output}
+				\caption{Forward propagation - getting the outputs}
 			\end{figure}
 		}
 		\only<2>{
 			\begin{figure}
 				\includegraphics[width=0.8\textwidth]{imgs/backpropagation.png}
-				\caption{Back propagation - calculating A LOT of derivatives}
+				\caption{Back propagation - propagating the errors by calculating A LOT of derivatives}
 			\end{figure}
 		}
 	\end{center}
@@ -328,7 +328,7 @@
 				\begin{minipage}{0.5\textwidth}
 				\begin{figure}
 						\includegraphics[width=0.8\textwidth,trim={20cm 0 3cm 0},clip]{imgs/lstmandgru.png}
-						 \caption{LSTM cell}
+						 \caption{GRU cell}
 					\end{figure}
 				\end{minipage}
 
@@ -355,15 +355,26 @@
 
 \section{Our classification model}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{The model}
 
-\end{frame}
 
 \subsection{Data preparation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{The data}
+	\begin{itemize}
+		\item 1.8M products;
+		\item 15K customs description;
+		\item 500+ HS6 codes.
+	\end{itemize}
+\end{frame}
 
+
+\subsection{The model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{The model}
+	\begin{figure}
+		\includegraphics[height=0.6\textwidth]{imgs/model.png}
+		\caption{Current model architecture}
+	\end{figure}
 \end{frame}
 
 
