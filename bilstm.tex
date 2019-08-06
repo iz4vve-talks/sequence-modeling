@@ -367,6 +367,17 @@
 	\end{itemize}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Preparation}
+	In order to use the data, we have to:
+	\begin{itemize}
+		\item cleant the text (remove/fix typos, remove non-meaningful tokens, etc.);
+		\item remove stop words (a, the, of, ...);
+		\item tokenize the words (turning text into numbers);
+		\item retain only non-rare tokens.
+	\end{itemize}
+\end{frame}
+
 
 \subsection{The model}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -381,8 +392,33 @@
 \subsection{Evaluation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Results and evaluation}
+\begin{figure}
+		\includegraphics[width=0.7\textwidth]{imgs/training.png}
+		\caption{Training and validation}
+	\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Probability distribution per class on test set}
+\begin{figure}
+		\includegraphics[width=\textwidth]{imgs/performance.png}
+		\caption{Cumulative probability distribution per class}
+	\end{figure}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Deployment}
 
 \end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Pros and cons}
+\end{frame}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Problems??}
@@ -393,6 +429,10 @@
 		\end{figure}
 	\end{center}
 \end{frame}
+
+
+
+
 
 \section{Demo}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
