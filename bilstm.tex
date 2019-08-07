@@ -10,9 +10,9 @@
 \usepackage{adjustbox}
 
 % PRESENTER NOTES
-%\usepackage{pgfpages}
-%\setbeamertemplate{note page}[plain]
-%\setbeameroption{show notes on second screen=right}
+\usepackage{pgfpages}
+\setbeamertemplate{note page}[plain]
+\setbeameroption{show notes on second screen=right}
 
 \usepackage{array}  % image alignment in tabular
 \author{Pietro Mascolo}
@@ -107,6 +107,7 @@
 \section{Problem statement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Introduction}
+	\note{We are trying to achieve classification and data enrichment of products. We are interested in knowing what these products are in order to calculate taxes and duty rates for international shipping.}
 	\begin{block}{Problem statement}
 		We want to classify a generic product into an HS6 code and a brief description in order to determine duty rates for a given origin and destination.
 	\end{block}
@@ -131,6 +132,8 @@
 			\right.$$ \\
 		\end{tabular}
 	\end{center}
+	
+	\note{\\In particular we want to go from a generic description of the product to a more objective 'customs description' and to HS6 code.}
 \end{frame}
 
 
@@ -169,10 +172,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Problems!!}
 	\begin{itemize}
-		\item TFIDF encoding doesn't capture sequence relationship well! %\note{TFIDF can represent some n-gram features, but in a very limited way.}
+		\item TFIDF encoding doesn't capture sequence relationship well! \note{TFIDF can represent some n-gram features, but in a very limited way.}
 		\item Many models to keep track of!
 		\item Hard performance evaluation!
-		\item Some organizations have very little data to work on!
+		\item Some organizations have very little data to work on!  \note{\\Some orgs only have a handful of products or codes (sometimes less than 5!).}
 		\item Some organizations have a very limited catalogue (1 or 2 types of items)!
 	\end{itemize}
 
@@ -232,6 +235,7 @@
 				\includegraphics[width=\textwidth,trim={0 1cm 0 0},clip]{imgs/neuron.png}
 				\caption{How a neuron works}
 			\end{figure}
+			\note{The activation is usually used to introduce a non-linearity. This helps these algorithms to learn complex patterns.}
 		}
 	\end{center}
 \end{frame}
@@ -244,12 +248,14 @@
 				\includegraphics[width=0.8\textwidth]{imgs/forward-propagation.png}
 				\caption{Forward propagation - getting the outputs}
 			\end{figure}
+			\note{Forward pass calculates output based on the current model settings. The reults are compared with real labels in order to calculate how wrong we are.}
 		}
 		\only<2>{
 			\begin{figure}
 				\includegraphics[width=0.8\textwidth]{imgs/backpropagation.png}
 				\caption{Back propagation - propagating the errors by calculating A LOT of derivatives}
 			\end{figure}
+			\note{backpropagation tells us the dependencies on the final output on all the intermediate model statuses. These are updated to minimize the final error.}
 		}
 	\end{center}
 \end{frame}
@@ -259,6 +265,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Sequence learning - Recurrent Neural Networks}
+	\note{
+		RNN cells feed themselves a portion of knowledge. This can capture dequence dependencies.\\
+		This is achieved by means of an internal cell state that is fed as input to successive elements in the sequence.
+	}
 	\begin{center}
 		\only<1>{
 			\begin{figure}
@@ -281,6 +291,9 @@
 		\includegraphics[width=\textwidth,trim={0 0 0 3cm},clip]{imgs/vanishing.png}
 		\caption{Vanishing gradient illustration}
 	\end{figure}
+	
+	\note{Dependencies 'fade' with time. Effect of derivation.}
+	
 	\pause
 	\begin{alertblock}{Problem}
 		RNN don't work well with long sequences: they lose knowledge of long term dependencies.\\
@@ -291,11 +304,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Solving the short memory}
-	\begin{block}{LSTM and GRU solve the short memory problem}{
-		LSTM $\rightarrow$ Long Short Memory \\
-		GRU $\rightarrow$ Gated Recurrent Unit
-	}
-	\end{block}
 	
 	\only<1>{
 	
@@ -303,7 +311,38 @@
 			\begin{tabular}{ c  m{5cm} }
 				\begin{minipage}{0.5\textwidth}
 				\begin{figure}
-						\includegraphics[width=0.8\textwidth,trim={3cm 0 20cm 0},clip]{imgs/lstmandgru.png}
+						\includegraphics[width=0.8\textwidth]{imgs/rnncell.png}
+						 \caption{Simple RNN cell}
+					\end{figure}
+				\end{minipage}
+
+				& $$
+					\begin{array}{l}
+						
+						h_t = \tanh \left( x_{t-1} W_{hh}  +  h_{t-1} W_{xt} \right) \\
+						c_t  = W_{hy} h_t
+					\end{array} 
+				$$ \\
+			\end{tabular}
+		\end{center}
+	}
+	
+	\only<2-3>{
+		\begin{block}{LSTM and GRU solve the short memory problem}{
+			LSTM $\rightarrow$ Long Short Memory \\
+			GRU $\rightarrow$ Gated Recurrent Unit
+		}
+		\end{block}
+	}
+	
+	
+	\only<2>{
+	
+		\begin{center}
+			\begin{tabular}{ c  m{5cm} }
+				\begin{minipage}{0.5\textwidth}
+				\begin{figure}
+						\includegraphics[width=0.8\textwidth,trim={2.6cm 0 20cm 0},clip]{imgs/lstmandgru.png}
 						 \caption{LSTM cell}
 					\end{figure}
 				\end{minipage}
@@ -320,9 +359,17 @@
 				$$ \\
 			\end{tabular}
 		\end{center}
+		
+		\note{
+			Base idea is the $C_t$, representing the cell state. It goes through the whole process.\\
+			First step is deciding what information to throw away. Sigmoid 'forget gate' does this.\\
+			Next step is deciding what new information we want to add to the cell state. This is done by the update gate.\\
+			Update gate consists of sigmoid 'input layer gate' that decides which values we'll update.The tanh generates a vector of candidates that could be added to the state. The combination of these two updates the whole cell state.\\
+			Then we update the output. We use a tanh on cell state to push values in  (-1; 1) and then we multiply by the output of output gate (sigmoid) so that we only output what is decided by the cell state.
+		}
 	}
 	
-	\only<2>{
+	\only<3>{
 		\begin{center}
 			\begin{tabular}{ c  m{5cm} }
 				\begin{minipage}{0.5\textwidth}
@@ -343,6 +390,8 @@
 				$$ \\
 			\end{tabular}
 		\end{center}
+		\note{GRUs are a variant of LSTM cells. Forget and input gates are merged into a single Update gate that decides what to forget and what to update.\\
+			It also merges the hiddent state and cell state.\\ Due to these changes, GRUs are simpler than LSTM while being almost equally powerful, and faster to train.}
 	}
 	
 	
@@ -405,6 +454,16 @@
 		\caption{Cumulative probability distribution per class}
 	\end{figure}
 \end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{What about older models?}
+\begin{figure}
+		\includegraphics[width=0.8\textwidth, trim={0 4cm 0 2cm}, clip]{imgs/comparison.png}
+		\caption{Performance compared with older Lambda models}
+	\end{figure}
+\end{frame}
+
 
 
 
